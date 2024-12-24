@@ -1,0 +1,18 @@
+Results exported on: 2024-12-24 13:15:44
+
+Recommendation:
+Current Price: 594.69 USD
+Nearest Support: 600.78 USD
+200-Day Average: 548.16 USD
+Recommended Strike Price: 570.74 USD
+Recommended Duration (DTE): 45 days
+Implied Volatility (IV): 12.50%
+Comment: Secure strike price based on support level for attractive premiums.
+
+Backtest Results:
+  - Total Profit: 6208.42 USD
+  - Average Profit: 30.73 USD
+
+Parameters Used:
+  - Strike Price: 570.74 USD
+  - Duration (DTE): 45 days
