@@ -1,6 +1,7 @@
 
 # Financial Data Analysis and Options Backtesting 
-# Only for Education
+# ONLY FOR EDUCATIONAL PURPOSES
+
 
 This repository contains a Python script for analyzing financial market data, detecting trends, and providing trading recommendations based on support levels, Bollinger Bands, and implied volatility (IV). The script also includes an interactive graphical user interface (GUI) for enhanced usability.
 

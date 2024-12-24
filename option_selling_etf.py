@@ -10,6 +10,8 @@ from tkinter import ttk
 import threading
 from yahoo_fin import options
 
+#ONLY FOR EDUCATIONAL PURPOSES
+
 def detect_trends(data):
     """
     Identifies upward and downward trendlines based on highs and lows.
