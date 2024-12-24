@@ -58,10 +58,10 @@ pip install numpy pandas matplotlib yfinance scipy scikit-learn yahoo-fin
 ## Screenshots
 
 SPY ETF Picture:
-![SPY ETF Picutre]](images/Figure_SPY.png)
+![SPY ETF Picutre](images/Figure_SPY.png)
 
 IWM ETF Picture:
-![IWM ETF Picutre]](images/Figure_IWM.png)
+![IWM ETF Picutre](images/Figure_IWM.png)
 
 
 ## Contributing
