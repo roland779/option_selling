@@ -1,3 +1,5 @@
+import os
+from datetime import datetime
 from sklearn.linear_model import LinearRegression
 import yfinance as yf
 import matplotlib.pyplot as plt
@@ -10,7 +12,7 @@ from tkinter import ttk
 import threading
 from yahoo_fin import options
 
-#ONLY FOR EDUCATIONAL PURPOSES
+# ONLY FOR EDUCATIONAL PURPOSES
 
 def detect_trends(data):
     """
@@ -30,9 +32,9 @@ def clean_data(series):
     Cleans the data to ensure it contains only numeric values.
     """
     if isinstance(series, pd.DataFrame):
-        series = series.squeeze()  # Convert single-column DataFrame to Series
+        series = series.squeeze()
     elif isinstance(series, np.ndarray) and series.ndim > 1:
-        series = pd.Series(series.ravel())  # Flatten multi-dimensional arrays
+        series = pd.Series(series.ravel())
     return pd.to_numeric(series, errors='coerce').dropna()
 
 def get_iv(symbol):
@@ -52,15 +54,14 @@ def calculate_trendline(data):
     """
     Calculates the trendline based on closing prices.
     """
-    data = data.reset_index()  # Reset index to use date values
-    x = np.arange(len(data)).reshape(-1, 1)  # Index as independent variable
-    y = data['Close'].values  # Closing prices as dependent variable
+    data = data.reset_index()
+    x = np.arange(len(data)).reshape(-1, 1)
+    y = data['Close'].values
 
-    # Linear regression
     model = LinearRegression()
     model.fit(x, y)
     trendline = model.predict(x)
-    slope = float(model.coef_[0])  # Extract slope as float
+    slope = float(model.coef_[0])
     return trendline, slope
 
 def calculate_bollinger_bands(data, window=20, num_std_dev=2):
@@ -80,22 +81,19 @@ def backtest_strategy(data, strike_price, dte):
     Backtests a put-option strategy.
     """
     profits = []
-    close_prices = data['Close'].values  # Extract closing prices as a NumPy array
+    close_prices = data['Close'].values
 
     for i in range(len(close_prices) - dte):
         option_start_price = close_prices[i]
-        option_end_price = close_prices[i + dte]  # Ensure float by direct access
+        option_end_price = close_prices[i + dte]
 
-        # Simulation: Option expires worthless if price stays above the strike price
         if float(option_end_price) >= float(strike_price):
-            profit = option_start_price * 0.02  # Hypothetical premium: 2% of the starting price
+            profit = option_start_price * 0.02
         else:
-            # Option exercised: Difference recorded as loss
             profit = strike_price - option_end_price
 
         profits.append(profit)
 
-    # Summarize results
     total_profit = np.sum(profits)
     avg_profit = np.mean(profits) if profits else 0
 
@@ -108,10 +106,10 @@ def generate_put_recommendation(data, support_levels, moving_average_200, iv):
     if support_levels.empty:
         return "No support levels found. Recommendation not possible."
 
-    current_price = float(data['Close'].iloc[-1])  # Current closing price
+    current_price = float(data['Close'].iloc[-1])
     nearest_support = min(support_levels, key=lambda x: abs(current_price - x))
-    strike_price = round(nearest_support * 0.95, 2)  # Safety margin 5% below support level
-    dte = 45  # Default to 45 days
+    strike_price = round(nearest_support * 0.95, 2)
+    dte = 45
 
     recommendation = (
         f"Current Price: {current_price:.2f} USD\n"
@@ -122,7 +120,6 @@ def generate_put_recommendation(data, support_levels, moving_average_200, iv):
         f"Implied Volatility (IV): {iv:.2%}\n"
         "Comment: Secure strike price based on support level for attractive premiums."
     )
-    print(recommendation)
     return recommendation, strike_price, dte
 
 def show_recommendation_in_window(recommendation):
@@ -142,6 +139,39 @@ def show_recommendation_in_window(recommendation):
         window.mainloop()
 
     threading.Thread(target=display_window).start()
+
+def export_results_and_plot(recommendation, backtest_results, parameters, etf_name, folder="results", fig=None):
+    """
+    Exports the results to a file and saves the plot as an image with a timestamp and ETF name.
+    """
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    safe_etf_name = etf_name.replace(" ", "_").replace("/", "_")
+    results_filename = os.path.join(folder, f"results_{safe_etf_name}_{timestamp}.txt")
+    plot_filename = os.path.join(folder, f"plot_{safe_etf_name}_{timestamp}.png")
+
+    total_profit, avg_profit = backtest_results
+    content = (
+        f"Results exported on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+        f"Recommendation:\n{recommendation}\n\n"
+        f"Backtest Results:\n"
+        f"  - Total Profit: {total_profit:.2f} USD\n"
+        f"  - Average Profit: {avg_profit:.2f} USD\n\n"
+        f"Parameters Used:\n"
+        f"  - Strike Price: {parameters['strike_price']:.2f} USD\n"
+        f"  - Duration (DTE): {parameters['dte']} days\n"
+    )
+
+    with open(results_filename, "w") as file:
+        file.write(content)
+
+    print(f"Results successfully exported: {results_filename}")
+
+    if fig:
+        fig.savefig(plot_filename, dpi=300)
+        print(f"Plot image successfully exported: {plot_filename}")
 
 def plot_trends_and_backtest(selected_etf, selected_year):
     """
@@ -170,10 +200,9 @@ def plot_trends_and_backtest(selected_etf, selected_year):
 
     show_recommendation_in_window(recommendation)
     total_profit, avg_profit = backtest_strategy(data_for_year, strike_price=strike_price, dte=dte)
-    print(f"Backtest Results:\nTotal Profit: {total_profit:.2f} USD\nAverage Profit: {avg_profit:.2f} USD")
-    print(f"Parameters Used:\nStrike Price: {strike_price:.2f} USD\nDuration: {dte} days")
 
-    plt.ion()
+    parameters = {"strike_price": strike_price, "dte": dte}
+
     fig, ax = plt.subplots(figsize=(16, 10))
     ax.plot(data_for_year.index, close_prices.loc[data_for_year.index], label=f'{selected_etf} Closing Price', color='blue', alpha=0.6)
     ax.plot(data_for_year.index, rolling_mean, label="20-Day Moving Average", color='black', linestyle='--', alpha=0.7)
@@ -193,6 +222,9 @@ def plot_trends_and_backtest(selected_etf, selected_year):
     ax.legend(loc='upper left')
     ax.grid(True)
     plt.tight_layout()
+
+    export_results_and_plot(recommendation, (total_profit, avg_profit), parameters, selected_etf, fig=fig)
+
     plt.show(block=False)
     plt.pause(0.1)
 
@@ -216,7 +248,7 @@ def start_selection_window():
     etf_selector.pack(pady=5)
 
     tk.Label(root, text="Select Year:").pack(pady=5)
-    year_selector = ttk.Combobox(root, values=[2020,2021, 2022, 2023, 2024])
+    year_selector = ttk.Combobox(root, values=[2020, 2021, 2022, 2023, 2024])
     year_selector.set("2024")
     year_selector.pack(pady=5)
 
