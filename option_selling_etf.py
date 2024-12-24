@@ -154,12 +154,12 @@ def export_results_and_plot(recommendation, backtest_results, parameters, etf_na
 
     total_profit, avg_profit = backtest_results
     content = (
-        f"Results exported on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
-        f"Recommendation:\n{recommendation}\n\n"
+        f"Results exported on: {safe_etf_name} {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+        f"Recommendation {safe_etf_name} :\n{recommendation}\n\n"
         f"Backtest Results:\n"
         f"  - Total Profit: {total_profit:.2f} USD\n"
         f"  - Average Profit: {avg_profit:.2f} USD\n\n"
-        f"Parameters Used:\n"
+        f"Parameters Used for selling puts on {safe_etf_name}:\n"
         f"  - Strike Price: {parameters['strike_price']:.2f} USD\n"
         f"  - Duration (DTE): {parameters['dte']} days\n"
     )
@@ -170,14 +170,15 @@ def export_results_and_plot(recommendation, backtest_results, parameters, etf_na
     print(f"Results successfully exported: {results_filename}")
 
     if fig:
-        fig.savefig(plot_filename, dpi=300)
+        results_plot_filename = os.path.join(folder,f"results__{safe_etf_name}_{safe_etf_name}_{timestamp}_plot.png")
+        fig.savefig(results_plot_filename, dpi=300)
         print(f"Plot image successfully exported: {plot_filename}")
 
 def plot_trends_and_backtest(selected_etf, selected_year):
     """
     Plots the chart with trends, breakouts, Bollinger Bands, and support/resistance levels.
     """
-    start_date = f'{selected_year-1}-01-01'
+    start_date = f'{selected_year-2}-01-01'
     end_date = f'{selected_year}-12-31'
     data = yf.download(selected_etf, start=start_date, end=end_date)
 
@@ -185,7 +186,7 @@ def plot_trends_and_backtest(selected_etf, selected_year):
         raise ValueError(f"The 'Close' column is missing from the downloaded data for {selected_etf}.")
 
     close_prices = clean_data(data[['Close']])
-    data_for_year = data.loc[f'{selected_year}-01-01':f'{selected_year}-12-31']
+    data_for_year = data.loc[f'{selected_year-1}-01-01':f'{selected_year}-12-31']
 
     maxima_points, minima_points = detect_trends(data_for_year)
     resistance_levels = clean_data(maxima_points['Close']) if not maxima_points.empty else pd.Series([])

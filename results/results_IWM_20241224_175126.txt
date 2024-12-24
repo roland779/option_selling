@@ -1,18 +1,18 @@
-Results exported on: 2024-12-24 11:08:17
+Results exported on: IWM 2024-12-24 17:51:26
 
-Recommendation:
-Current Price: 221.41 USD
+Recommendation IWM :
+Current Price: 222.71 USD
 Nearest Support: 219.86 USD
-200-Day Average: 212.60 USD
+200-Day Average: 212.70 USD
 Recommended Strike Price: 208.87 USD
 Recommended Duration (DTE): 45 days
-Implied Volatility (IV): 26.37%
+Implied Volatility (IV): 44.85%
 Comment: Secure strike price based on support level for attractive premiums.
 
 Backtest Results:
-  - Total Profit: 1167.33 USD
-  - Average Profit: 5.78 USD
+  - Total Profit: 8187.48 USD
+  - Average Profit: 18.07 USD
 
-Parameters Used:
+Parameters Used for selling puts on IWM:
   - Strike Price: 208.87 USD
   - Duration (DTE): 45 days
