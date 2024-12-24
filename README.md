@@ -4,7 +4,8 @@ Python program for financial data analysis: includes trend detection, Bollinger 
 Financial Data Analysis and Options Backtesting
 
 This repository contains a Python script for analyzing financial market data, detecting trends, and providing trading recommendations based on support levels, Bollinger Bands, and implied volatility (IV). The script also includes an interactive graphical user interface (GUI) for enhanced usability.
-Features
+
+**Features**
 
     Trend Detection: Identifies upward and downward trends using local maxima and minima.
     Bollinger Bands: Calculates upper and lower Bollinger Bands for closing prices.
@@ -13,6 +14,7 @@ Features
     Backtesting: Simulates a put-option trading strategy to analyze profitability.
     Interactive GUI: Allows users to select ETFs and specific years for analysis.
     Visualization: Plots trends, Bollinger Bands, support/resistance levels, and moving averages.
+
 
 Prerequisites
 
