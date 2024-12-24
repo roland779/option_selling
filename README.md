@@ -36,9 +36,8 @@ pip install numpy pandas matplotlib yfinance scipy scikit-learn yahoo-fin
 How to Use
 
     Clone the repository:
-
-git clone https://github.com/yourusername/financial-data-analysis.git
-cd financial-data-analysis
+    git clone https://github.com/yourusername/financial-data-analysis.git
+    cd financial-data-analysis
 
 Run the script:
 
@@ -55,6 +54,7 @@ Example Output
 Screenshots
 
 Add screenshots of the GUI and visualizations here.
+
 Contributing
 
 Feel free to fork this repository and submit pull requests for improvements or new features. For major changes, please open an issue first to discuss your ideas.
