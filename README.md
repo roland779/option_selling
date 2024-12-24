@@ -61,6 +61,10 @@ Add screenshots of the GUI and visualizations here.
 
 Feel free to fork this repository and submit pull requests for improvements or new features. For major changes, please open an issue first to discuss your ideas.
 
+### Collaboration and Suggestions
+
+Contributions, feedback, and suggestions are always welcome! Whether it's a bug fix, a feature request, or an idea to improve the project, feel free to reach out or create an issue in the repository.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
