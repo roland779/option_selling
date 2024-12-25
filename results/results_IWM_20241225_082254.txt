@@ -1,12 +1,12 @@
-Results exported on: IWM 2024-12-24 17:51:26
+Results exported on: IWM 2024-12-25 08:22:54
 
 Recommendation IWM :
-Current Price: 222.71 USD
+Current Price: 223.39 USD
 Nearest Support: 219.86 USD
 200-Day Average: 212.70 USD
 Recommended Strike Price: 208.87 USD
 Recommended Duration (DTE): 45 days
-Implied Volatility (IV): 44.85%
+Implied Volatility (IV): 37.50%
 Comment: Secure strike price based on support level for attractive premiums.
 
 Backtest Results:

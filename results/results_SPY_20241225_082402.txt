@@ -1,0 +1,18 @@
+Results exported on: SPY 2024-12-25 08:24:02
+
+Recommendation SPY :
+Current Price: 601.30 USD
+Nearest Support: 600.78 USD
+200-Day Average: 548.64 USD
+Recommended Strike Price: 570.74 USD
+Recommended Duration (DTE): 45 days
+Implied Volatility (IV): 38.83%
+Comment: Secure strike price based on support level for attractive premiums.
+
+Backtest Results:
+  - Total Profit: 40038.35 USD
+  - Average Profit: 88.38 USD
+
+Parameters Used for selling puts on SPY:
+  - Strike Price: 570.74 USD
+  - Duration (DTE): 45 days

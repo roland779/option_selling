@@ -50,6 +50,22 @@ def get_iv(symbol):
         print(f"Error fetching IV for {symbol}: {e}")
         return None
 
+def calculate_rsi(data, window=14):
+    """
+    Berechnet den Relative Strength Index (RSI).
+    """
+    delta = data['Close'].diff(1)
+    gain = delta.where(delta > 0, 0)
+    loss = -delta.where(delta < 0, 0)
+
+    avg_gain = gain.rolling(window=window).mean()
+    avg_loss = loss.rolling(window=window).mean()
+
+    rs = avg_gain / avg_loss
+    rsi = 100 - (100 / (1 + rs))
+    data['RSI'] = rsi
+    return data
+
 def calculate_trendline(data):
     """
     Calculates the trendline based on closing prices.
@@ -150,7 +166,7 @@ def export_results_and_plot(recommendation, backtest_results, parameters, etf_na
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     safe_etf_name = etf_name.replace(" ", "_").replace("/", "_")
     results_filename = os.path.join(folder, f"results_{safe_etf_name}_{timestamp}.txt")
-    plot_filename = os.path.join(folder, f"plot_{safe_etf_name}_{timestamp}.png")
+    plot_filename = os.path.join(folder, f"results_{safe_etf_name}_{timestamp}.png")
 
     total_profit, avg_profit = backtest_results
     content = (
@@ -170,13 +186,12 @@ def export_results_and_plot(recommendation, backtest_results, parameters, etf_na
     print(f"Results successfully exported: {results_filename}")
 
     if fig:
-        results_plot_filename = os.path.join(folder,f"results__{safe_etf_name}_{safe_etf_name}_{timestamp}_plot.png")
-        fig.savefig(results_plot_filename, dpi=300)
+        fig.savefig(plot_filename, dpi=300)
         print(f"Plot image successfully exported: {plot_filename}")
 
 def plot_trends_and_backtest(selected_etf, selected_year):
     """
-    Plots the chart with trends, breakouts, Bollinger Bands, and support/resistance levels.
+    Plots the chart with trends, RSI, Bollinger Bands, and support/resistance levels.
     """
     start_date = f'{selected_year-2}-01-01'
     end_date = f'{selected_year}-12-31'
@@ -197,6 +212,10 @@ def plot_trends_and_backtest(selected_etf, selected_year):
     moving_average_200 = data['Close'].rolling(window=200).mean()
     moving_average_200_value = float(moving_average_200.iloc[-1])
     iv = get_iv(selected_etf) or 0.0
+
+    # RSI berechnen
+    data_for_year = calculate_rsi(data_for_year)
+
     recommendation, strike_price, dte = generate_put_recommendation(data_for_year, support_levels, moving_average_200_value, iv)
 
     show_recommendation_in_window(recommendation)
@@ -204,24 +223,37 @@ def plot_trends_and_backtest(selected_etf, selected_year):
 
     parameters = {"strike_price": strike_price, "dte": dte}
 
-    fig, ax = plt.subplots(figsize=(16, 10))
-    ax.plot(data_for_year.index, close_prices.loc[data_for_year.index], label=f'{selected_etf} Closing Price', color='blue', alpha=0.6)
-    ax.plot(data_for_year.index, rolling_mean, label="20-Day Moving Average", color='black', linestyle='--', alpha=0.7)
-    ax.plot(data_for_year.index, upper_band, label="Upper Bollinger Band", color='purple', linestyle='--', alpha=0.7)
-    ax.plot(data_for_year.index, lower_band, label="Lower Bollinger Band", color='purple', linestyle='--', alpha=0.7)
-    ax.plot(data_for_year.index, moving_average_200.loc[data_for_year.index], label="200-Day Moving Average", color='cyan', linestyle='-', linewidth=1.5)
+    # Plot erstellen
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 12), gridspec_kw={'height_ratios': [3, 1]})
+
+    # Oberer Plot: Preis und Indikatoren
+    ax1.plot(data_for_year.index, close_prices.loc[data_for_year.index], label=f'{selected_etf} Closing Price', color='blue', alpha=0.6)
+    ax1.plot(data_for_year.index, rolling_mean, label="20-Day Moving Average", color='black', linestyle='--', alpha=0.7)
+    ax1.plot(data_for_year.index, upper_band, label="Upper Bollinger Band", color='purple', linestyle='--', alpha=0.7)
+    ax1.plot(data_for_year.index, lower_band, label="Lower Bollinger Band", color='purple', linestyle='--', alpha=0.7)
+    ax1.plot(data_for_year.index, moving_average_200.loc[data_for_year.index], label="200-Day Moving Average", color='cyan', linestyle='-', linewidth=1.5)
 
     for level in resistance_levels:
-        ax.axhline(y=level, color='red', linestyle='--', alpha=0.7)
+        ax1.axhline(y=level, color='red', linestyle='--', alpha=0.7)
     for level in support_levels:
-        ax.axhline(y=level, color='green', linestyle='--', alpha=0.7)
+        ax1.axhline(y=level, color='green', linestyle='--', alpha=0.7)
 
-    ax.plot(data_for_year.index, trendline, label=f"Trendline (Slope: {slope:.2f})", color='orange', linestyle='-')
-    ax.set_title(f'{selected_etf} Trends, Breakouts, Bollinger Bands and 200-Day Moving Average ({selected_year})')
-    ax.set_xlabel('Date')
-    ax.set_ylabel('Price in USD')
-    ax.legend(loc='upper left')
-    ax.grid(True)
+    ax1.plot(data_for_year.index, trendline, label=f"Trendline (Slope: {slope:.2f})", color='orange', linestyle='-')
+    ax1.set_title(f'{selected_etf} Trends, Breakouts, Bollinger Bands and 200-Day Moving Average ({selected_year})')
+    ax1.set_ylabel('Price in USD')
+    ax1.legend(loc='upper left')
+    ax1.grid(True)
+
+    # Unterer Plot: RSI
+    ax2.plot(data_for_year.index, data_for_year['RSI'], label="RSI", color='darkblue', alpha=0.8)
+    ax2.axhline(70, color='red', linestyle='--', alpha=0.7, label='Overbought (70)')
+    ax2.axhline(30, color='green', linestyle='--', alpha=0.7, label='Oversold (30)')
+    ax2.set_title('Relative Strength Index (RSI)')
+    ax2.set_xlabel('Date')
+    ax2.set_ylabel('RSI')
+    ax2.legend(loc='upper left')
+    ax2.grid(True)
+
     plt.tight_layout()
 
     export_results_and_plot(recommendation, (total_profit, avg_profit), parameters, selected_etf, fig=fig)
