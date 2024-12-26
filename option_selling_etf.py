@@ -276,7 +276,7 @@ def start_selection_window():
     root.geometry("400x200")
 
     tk.Label(root, text="Select ETF:").pack(pady=5)
-    etf_selector = ttk.Combobox(root, values=["IWM", "SPY", "QQQ", "KWEB"])
+    etf_selector = ttk.Combobox(root, values=["IWM", "SPY", "QQQ", "KWEB","ARKK"])
     etf_selector.set("IWM")
     etf_selector.pack(pady=5)
 
