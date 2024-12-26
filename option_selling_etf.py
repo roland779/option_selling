@@ -164,9 +164,12 @@ def export_results_and_plot(recommendation, backtest_results, parameters, etf_na
         os.makedirs(folder)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    monthyearstamp=datetime.now().strftime("%Y%m")
+    
     safe_etf_name = etf_name.replace(" ", "_").replace("/", "_")
     results_filename = os.path.join(folder, f"results_{safe_etf_name}_{timestamp}.txt")
     plot_filename = os.path.join(folder, f"results_{safe_etf_name}_{timestamp}.png")
+    recommendation_filename = os.path.join(folder, f"recommedation_{monthyearstamp}.txt")
 
     total_profit, avg_profit = backtest_results
     content = (
@@ -179,15 +182,33 @@ def export_results_and_plot(recommendation, backtest_results, parameters, etf_na
         f"  - Strike Price: {parameters['strike_price']:.2f} USD\n"
         f"  - Duration (DTE): {parameters['dte']} days\n"
     )
+    
+    rec_content = (
+        f"#########################################################################################################\n"
+        f"Results exported on: {safe_etf_name} {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+        f"Recommendation {safe_etf_name} :\n{recommendation}\n\n"
+        f"Parameters Used for selling puts on {safe_etf_name}:\n"
+        f"  - Strike Price: {parameters['strike_price']:.2f} USD\n"
+        f"  - Duration (DTE): {parameters['dte']} days\n\n"
+        f"*********************************************************************************************************\n"
+    )
 
+    # Save the results to a separate file
     with open(results_filename, "w") as file:
         file.write(content)
-
+        
     print(f"Results successfully exported: {results_filename}")
+
+    # Save the recommendation to a separate file
+    with open(recommendation_filename, "a") as file:
+        file.write(rec_content)
+        
+    print(f"Recommendation successfully exported: {recommendation_filename}")
 
     if fig:
         fig.savefig(plot_filename, dpi=300)
         print(f"Plot image successfully exported: {plot_filename}")
+
 
 def plot_trends_and_backtest(selected_etf, selected_year):
     """
