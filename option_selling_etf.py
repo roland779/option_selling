@@ -12,7 +12,12 @@ from tkinter import ttk
 import threading
 from yahoo_fin import options
 
+############################################################################################################
+# Option-Selling Strategy for ETFs
+#
 # ONLY FOR EDUCATIONAL PURPOSES
+############################################################################################################
+
 
 def detect_trends(data):
     """
@@ -52,7 +57,7 @@ def get_iv(symbol):
 
 def calculate_rsi(data, window=14):
     """
-    Berechnet den Relative Strength Index (RSI).
+    Calculates the Relative Strength Index (RSI).
     """
     delta = data['Close'].diff(1)
     gain = delta.where(delta > 0, 0)
@@ -234,7 +239,7 @@ def plot_trends_and_backtest(selected_etf, selected_year):
     moving_average_200_value = float(moving_average_200.iloc[-1])
     iv = get_iv(selected_etf) or 0.0
 
-    # RSI berechnen
+    # Calculate RSI
     data_for_year = calculate_rsi(data_for_year)
 
     recommendation, strike_price, dte = generate_put_recommendation(data_for_year, support_levels, moving_average_200_value, iv)
@@ -244,28 +249,28 @@ def plot_trends_and_backtest(selected_etf, selected_year):
 
     parameters = {"strike_price": strike_price, "dte": dte}
 
-    # Plot erstellen
+    # Create plot
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 12), gridspec_kw={'height_ratios': [3, 1]})
 
-    # Oberer Plot: Preis und Indikatoren
+    # Upper plot: Price and indicators
     ax1.plot(data_for_year.index, close_prices.loc[data_for_year.index], label=f'{selected_etf} Closing Price', color='blue', alpha=0.6)
     ax1.plot(data_for_year.index, rolling_mean, label="20-Day Moving Average", color='black', linestyle='--', alpha=0.7)
     ax1.plot(data_for_year.index, upper_band, label="Upper Bollinger Band", color='purple', linestyle='--', alpha=0.7)
     ax1.plot(data_for_year.index, lower_band, label="Lower Bollinger Band", color='purple', linestyle='--', alpha=0.7)
     ax1.plot(data_for_year.index, moving_average_200.loc[data_for_year.index], label="200-Day Moving Average", color='cyan', linestyle='-', linewidth=1.5)
-
+    ax1.plot(data_for_year.index, trendline, label=f"Trendline (Slope: {slope:.2f})", color='orange', linestyle='-')
+ 
     for level in resistance_levels:
         ax1.axhline(y=level, color='red', linestyle='--', alpha=0.7)
     for level in support_levels:
         ax1.axhline(y=level, color='green', linestyle='--', alpha=0.7)
 
-    ax1.plot(data_for_year.index, trendline, label=f"Trendline (Slope: {slope:.2f})", color='orange', linestyle='-')
-    ax1.set_title(f'{selected_etf} Trends, Breakouts, Bollinger Bands and 200-Day Moving Average ({selected_year})')
+    ax1.set_title(f"{selected_etf} Trends and Bollinger Bands ({selected_year})")
     ax1.set_ylabel('Price in USD')
     ax1.legend(loc='upper left')
     ax1.grid(True)
 
-    # Unterer Plot: RSI
+    # Lower plot: RSI
     ax2.plot(data_for_year.index, data_for_year['RSI'], label="RSI", color='darkblue', alpha=0.8)
     ax2.axhline(70, color='red', linestyle='--', alpha=0.7, label='Overbought (70)')
     ax2.axhline(30, color='green', linestyle='--', alpha=0.7, label='Oversold (30)')

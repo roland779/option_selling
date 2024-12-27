@@ -5,20 +5,23 @@ import csv
 from datetime import datetime
 import os
 
-def log_put_option_trade(date, time, action, quantity, symbol, expiry, strike_price, option_type, price):
+############################################################################################################
+# Log Option Trades
+############################################################################################################
+
+def log_put_option_trade(date, time, action, quantity, symbol, expiry, strike_price, option_type, price, comment):
     """
     Logs a put option trade to a CSV file.
     """
-    folder="trades"
+    folder = "trades"
     if not os.path.exists(folder):
         os.makedirs(folder)
-    
+
     timestamp = datetime.now().strftime("%Y%m")
     log_file = os.path.join(folder, f"option_log_{timestamp}.csv")
 
-    
-    headers = ["Date", "Time", "Action", "Quantity", "Symbol", "Expiry", "Strike Price", "Option Type", "Price"]
-    entry = [date, time, action, quantity, symbol, expiry, strike_price, option_type, price]
+    headers = ["Date", "Time", "Action", "Quantity", "Symbol", "Expiry", "Strike Price", "Option Type", "Price", "Comment"]
+    entry = [date, time, action, quantity, symbol, expiry, strike_price, option_type, price, comment]
 
     # Check if the log file exists and write headers if needed
     file_exists = os.path.isfile(log_file)
@@ -67,15 +70,16 @@ def open_trade_entry_window():
             strike_price = float(strike_price_entry.get())
             option_type = option_type_var.get()
             price = float(price_entry.get())
+            comment = comment_entry.get("1.0", tk.END).strip()
 
             # Log the trade
-            log_put_option_trade(date, time, action, quantity, symbol, expiry, strike_price, option_type, price)
+            log_put_option_trade(date, time, action, quantity, symbol, expiry, strike_price, option_type, price, comment)
 
             # Show success message
-            messagebox.showinfo("Trade Logged", f"Trade successfully logged:\n\n{action} {quantity} {symbol} {option_type} {expiry} {strike_price} @ {price}")
+            messagebox.showinfo("Trade Logged", f"Trade successfully logged:\n\n{action} {quantity} {symbol} {option_type} {expiry} {strike_price} @ {price}\nComment: {comment}")
 
             # Close the window
-            #trade_window.destroy()
+            # trade_window.destroy()
         except ValueError as e:
             messagebox.showerror("Input Error", "Please ensure all fields are filled correctly.\n" + str(e))
 
@@ -83,7 +87,7 @@ def open_trade_entry_window():
     global trade_window, expiry_entry  # Define global variables for calendar interaction
     trade_window = tk.Tk()
     trade_window.title("Enter Trade")
-    trade_window.geometry("400x800")
+    trade_window.geometry("400x900")
 
     # Add input fields
     tk.Label(trade_window, text="Date (YYYY-MM-DD):").pack(pady=5)
@@ -128,6 +132,10 @@ def open_trade_entry_window():
     tk.Label(trade_window, text="Price:").pack(pady=5)
     price_entry = tk.Entry(trade_window)
     price_entry.pack(pady=5)
+
+    tk.Label(trade_window, text="Comments:").pack(pady=5)
+    comment_entry = tk.Text(trade_window, height=5, width=40)
+    comment_entry.pack(pady=5)
 
     # Submit button
     submit_button = tk.Button(trade_window, text="Log Trade", command=submit_trade)
