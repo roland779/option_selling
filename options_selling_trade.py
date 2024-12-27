@@ -4,14 +4,11 @@ from tkcalendar import Calendar
 import csv
 from datetime import datetime
 import os
+import pandas as pd
 
-############################################################################################################
-# Log Option Trades
-############################################################################################################
-
-def log_put_option_trade(date, time, action, quantity, symbol, expiry, strike_price, option_type, price, comment):
+def log_put_option_trade_to_html(date, time, action, quantity, symbol, expiry, strike_price, option_type, price, comment):
     """
-    Logs a put option trade to a CSV file.
+    Logs a put option trade to a CSV file and exports it to a well-formatted HTML webpage.
     """
     folder = "trades"
     if not os.path.exists(folder):
@@ -19,6 +16,7 @@ def log_put_option_trade(date, time, action, quantity, symbol, expiry, strike_pr
 
     timestamp = datetime.now().strftime("%Y%m")
     log_file = os.path.join(folder, f"option_log_{timestamp}.csv")
+    html_file = os.path.join(folder, f"option_log_{timestamp}.html")
 
     headers = ["Date", "Time", "Action", "Quantity", "Symbol", "Expiry", "Strike Price", "Option Type", "Price", "Comment"]
     entry = [date, time, action, quantity, symbol, expiry, strike_price, option_type, price, comment]
@@ -33,6 +31,76 @@ def log_put_option_trade(date, time, action, quantity, symbol, expiry, strike_pr
         writer.writerow(entry)  # Write the trade entry
 
     print(f"Trade logged: {entry}")
+
+    # Convert CSV to a well-formatted HTML file
+    try:
+        df = pd.read_csv(log_file)
+        html_content = f"""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Trade Log - {timestamp}</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    margin: 20px;
+                    background-color: #f4f4f9;
+                    color: #333;
+                }}
+                h1 {{
+                    color: #007bff;
+                }}
+                table {{
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                }}
+                th, td {{
+                    border: 1px solid #ddd;
+                    text-align: left;
+                    padding: 8px;
+                }}
+                th {{
+                    background-color: #007bff;
+                    color: white;
+                }}
+                tr:nth-child(even) {{
+                    background-color: #f9f9f9;
+                }}
+                tr:hover {{
+                    background-color: #f1f1f1;
+                }}
+            </style>
+        </head>
+        <body>
+            <h1>Trade Log for {timestamp}</h1>
+            <table>
+                <thead>
+                    <tr>
+                        {''.join(f"<th>{col}</th>" for col in headers)}
+                    </tr>
+                </thead>
+                <tbody>
+        """
+        for _, row in df.iterrows():
+            html_content += "<tr>" + "".join(f"<td>{value}</td>" for value in row) + "</tr>\n"
+
+        html_content += """
+                </tbody>
+            </table>
+        </body>
+        </html>
+        """
+
+        with open(html_file, "w", encoding="utf-8") as file:
+            file.write(html_content)
+
+        print(f"Trades exported to HTML: {html_file}")
+
+    except Exception as e:
+        print(f"Error exporting to HTML: {e}")
 
 def open_calendar():
     """
@@ -72,14 +140,12 @@ def open_trade_entry_window():
             price = float(price_entry.get())
             comment = comment_entry.get("1.0", tk.END).strip()
 
-            # Log the trade
-            log_put_option_trade(date, time, action, quantity, symbol, expiry, strike_price, option_type, price, comment)
+            # Log the trade and export to HTML
+            log_put_option_trade_to_html(date, time, action, quantity, symbol, expiry, strike_price, option_type, price, comment)
 
             # Show success message
-            messagebox.showinfo("Trade Logged", f"Trade successfully logged:\n\n{action} {quantity} {symbol} {option_type} {expiry} {strike_price} @ {price}\nComment: {comment}")
+            messagebox.showinfo("Trade Logged", f"Trade successfully logged and exported:\n\n{action} {quantity} {symbol} {option_type} {expiry} {strike_price} @ {price}\nComment: {comment}")
 
-            # Close the window
-            # trade_window.destroy()
         except ValueError as e:
             messagebox.showerror("Input Error", "Please ensure all fields are filled correctly.\n" + str(e))
 

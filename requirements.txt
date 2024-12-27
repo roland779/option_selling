@@ -5,3 +5,4 @@ matplotlib
 scipy
 yahoo-fin
 tkcalendar
+tkinterhtml
