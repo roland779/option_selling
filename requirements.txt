@@ -1,0 +1,7 @@
+yfinance
+scikit-learn
+pandas
+matplotlib
+scipy
+yahoo-fin
+tkcalendar
