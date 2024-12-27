@@ -129,8 +129,10 @@ pip install -r requirements.txt
 ## Screenshots
 
 - **SPY ETF Visualization**:&#x20;
+![SPY ETF Image](images/Figure_SPY.png)
 
 - **IWM ETF Visualization**:&#x20;
+![IWM ETF Image](images/Figure_IWM.png)
 
 ---
 
