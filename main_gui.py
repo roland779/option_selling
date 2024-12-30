@@ -7,7 +7,7 @@ def start_etf_analysis():
     """Launches the ETF Analysis module."""
     try:
         venv_python = os.path.join(os.getcwd(), ".venv", "Scripts", "python")
-        script_path = os.path.join(os.getcwd(), "option_selling", "option_selling_etf.py")
+        script_path = os.path.join(os.getcwd(), "option_selling", "option_selling_strategy_etf.py")
         subprocess.Popen([venv_python, script_path])
     except Exception as e:
         messagebox.showerror("Error", f"Failed to start ETF Analysis: {e}")
